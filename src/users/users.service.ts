@@ -1,33 +1,18 @@
 import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from 'src/entities/user.entity'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class UsersService {
-  private readonly users: any[]
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-        pet: { name: 'alfred', picId: 1 },
-      },
-      {
-        userId: 2,
-        username: 'chris',
-        password: 'secret',
-        pet: { name: 'gopher', picId: 2 },
-      },
-      {
-        userId: 3,
-        username: 'maria',
-        password: 'guess',
-        pet: { name: 'jenny', picId: 3 },
-      },
-    ]
-  }
-
-  async findOne(username: string): Promise<any> {
-    return this.users.find((user) => user, username === username)
+  async findUserByUsername(username: string) {
+    return await this.userRepository.findOne({
+      where: { username },
+      relations: ['pet'],
+    })
   }
 }
